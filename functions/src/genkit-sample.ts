@@ -13,8 +13,10 @@ import { onCallGenkit } from "firebase-functions/https";
 // If you are using Google Developer API (googleAI) you can get an API key at https://aistudio.google.com/app/apikey
 // If you are using Vertex Express Mode (vertexAI with apiKey) you can get an API key
 // from the Vertex AI Studio Express Mode setup.
-import { defineSecret } from "firebase-functions/params";
-const googleGenaiApiKey = defineSecret("GOOGLE_GENAI_API_KEY");
+import * as dotenv from "dotenv";
+dotenv.config();
+dotenv.config({ path: ".env.local" });
+const googleGenaiApiKey = process.env.GOOGLE_GENAI_API_KEY;
 
 // The Firebase telemetry plugin exports a combination of metrics, traces, and logs to Google Cloud
 // Observability. See https://firebase.google.com/docs/genkit/observability/telemetry-collection.
@@ -27,7 +29,7 @@ const ai = genkit({
     // passing in a config object; if you don't, the provider uses the value
     // from the GOOGLE_GENAI_API_KEY environment variable, which is the
     // recommended practice.
-    googleAI()
+    googleAI({ apiKey: googleGenaiApiKey })
   ],
 });
 
@@ -72,5 +74,4 @@ export const menuSuggestion = onCallGenkit({
   // authPolicy: hasClaim("email_verified"),
 
   // Grant access to the API key to this function:
-  secrets: [googleGenaiApiKey],
 }, menuSuggestionFlow);
